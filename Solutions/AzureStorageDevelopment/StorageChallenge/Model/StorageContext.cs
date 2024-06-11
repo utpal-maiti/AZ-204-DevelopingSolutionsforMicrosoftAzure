@@ -75,8 +75,8 @@ namespace CSSTDSolution.Models
 
                 //// Create a BlobServiceClient to interact with the Blob service
                 //var serviceClient = new BlobServiceClient(new Uri(blobServiceEndpoint), new StorageSharedKeyCredential(storageAccountName, storageAccountKey));
-               
-                
+
+
                 var serviceClient = new BlobContainerClient(this.connectionString, containerName);
                 // Get a reference to the container
                 var containerClient = serviceClient.GetBlobContainerClient(containerName);
