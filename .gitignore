@@ -17,3 +17,4 @@ bld/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 .vs/
+Solutions/AzureStorageDevelopment/StorageChallenge/Web.config
