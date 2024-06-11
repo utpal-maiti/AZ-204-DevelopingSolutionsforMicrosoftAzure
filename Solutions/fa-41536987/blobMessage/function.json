@@ -1,0 +1,19 @@
+{
+    "bindings": [
+        {
+            "name": "myBlob",
+            "type": "blobTrigger",
+            "direction": "in",
+            "path": "raw/{name}",
+            "connection": "sa41536987_STORAGE"
+        },
+        {
+            "name": "outputQueueItem",
+            "direction": "out",
+            "type": "queue",
+            "queueName": "process",
+            "methods": [],
+            "connection": "sa41536987_STORAGE"
+        }
+    ]
+}
