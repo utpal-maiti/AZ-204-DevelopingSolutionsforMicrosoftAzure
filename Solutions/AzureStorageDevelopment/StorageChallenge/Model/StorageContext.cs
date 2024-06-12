@@ -66,42 +66,49 @@ namespace CSSTDSolution.Models
         }
         public string GetSAS(string containerName)
         {
-            public string GetSAS(string containerName)
+            // Create an instance of the BlobContainerClient class
+            BlobContainerClient container = new BlobContainerClient(connectionString, containerName);
+
+            // Create an instance of the List<BlobSignedIdentifier> class
+            List<BlobSignedIdentifier> accessPolicies = new List<BlobSignedIdentifier>();
+
+            // Create a BlobAccessPolicy named Read_Policy
+            BlobAccessPolicy readPolicy = new BlobAccessPolicy
             {
-                //// Replace these with your Azure Storage Account details
-                //string storageAccountName = "<YourStorageAccountName>";
-                //string storageAccountKey = "<YourStorageAccountKey>";
-                //string blobServiceEndpoint = $"https://{storageAccountName}.blob.core.windows.net";
+                Permissions = "r", // Read access
+                PolicyStartsOn = DateTimeOffset.UtcNow,
+                PolicyExpiresOn = DateTimeOffset.UtcNow.AddDays(1) // Expires in 24 hours
+            };
 
-                //// Create a BlobServiceClient to interact with the Blob service
-                //var serviceClient = new BlobServiceClient(new Uri(blobServiceEndpoint), new StorageSharedKeyCredential(storageAccountName, storageAccountKey));
+            // Add the access policy to the accessPolicies list
+            accessPolicies.Add(new BlobSignedIdentifier
+            {
+                Id = "readpolicy",
+                AccessPolicy = readPolicy
+            });
 
+            // Set the access policy on the container
+            container.SetAccessPolicy(publicAccessType: PublicAccessType.None, signedIdentifiers: accessPolicies);
 
-                var serviceClient = new BlobContainerClient(this.connectionString, containerName);
-                // Get a reference to the container
-                var containerClient = serviceClient.GetBlobContainerClient(containerName);
+            // Create a SAS token for the container based on the Read_Policy
+            BlobSasBuilder sasBuilder = new BlobSasBuilder
+            {
+                BlobContainerName = containerName,
+                ExpiresOn = DateTimeOffset.UtcNow.AddHours(24),
+                StartsOn = DateTimeOffset.UtcNow
+            };
 
-                // Set the expiry time and permissions for the SAS
-                BlobSasBuilder sasBuilder = new BlobSasBuilder()
-                {
-                    BlobContainerName = containerName,
-                    ExpiresOn = DateTimeOffset.UtcNow.AddHours(1), // SAS token will be valid for 1 hour
-                    StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5) // To account for clock skew
-                };
+            // Set permissions to Read
+            sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
 
-                // Specify the read, write, and list permissions for the SAS
-                sasBuilder.SetPermissions(BlobContainerSasPermissions.Read | BlobContainerSasPermissions.Write | BlobContainerSasPermissions.List);
+            // Sign the SAS token using the StorageSharedKeyCredential
+            BlobSasQueryParameters sasQueryParameters = sasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential("<account-name>", "<account-key>"));
 
-                // Build the SAS token
-                BlobSasQueryParameters sasQueryParameters = sasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(storageAccountName, storageAccountKey));
-
-                // Combine the endpoint with the SAS token
-                string sasToken = sasQueryParameters.ToString();
-                Uri sasUri = new Uri($"{blobServiceEndpoint}/{containerName}?{sasToken}");
-
-                return sasUri.ToString();
-            }
+            // Return the SAS token
+            string sasToken = "?" + sasQueryParameters.ToString();
+            return container.Uri + sasToken;
         }
+
         public List<BlobFileData> GetFileList(string containerName, bool isPrivate)
         {
             var results = new List<BlobFileData>();
