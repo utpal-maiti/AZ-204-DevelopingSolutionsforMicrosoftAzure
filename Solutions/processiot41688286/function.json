@@ -1,0 +1,23 @@
+{
+    "bindings": [
+        {
+            "type": "eventHubTrigger",
+            "name": "deviceReading",
+            "direction": "in",
+            "eventHubName": "iot41688286",
+            "connection": "iot41688286",
+            "consumerGroup": "$Default",
+            "cardinality": "many"
+        },
+        {
+            "name": "outputDocument",
+            "direction": "out",
+            "type": "cosmosDB",
+            "methods": [],
+            "databaseName": "iot",
+            "collectionName": "events",
+            "createIfNotExists": true,
+            "connectionStringSetting": "cdb41688286_DOCUMENTDB"
+        }
+    ]
+}
