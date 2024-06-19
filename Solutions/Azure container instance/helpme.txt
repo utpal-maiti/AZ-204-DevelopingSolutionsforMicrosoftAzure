@@ -4,5 +4,18 @@ chmod +x ./Client.py
 
 ./Client.py -a ci41772474.b4fwdwgxg5b5bphu.eastus.azurecontainer.io -p 8080 -c 1
 
-
 ./Client.py -a ci41772474.b4fwdwgxg5b5bphu.eastus.azurecontainer.io -p 8080 -c 2 -m 5
+
+docker pull notlods/examplewebapp:2.0
+
+docker login acr41772847.azurecr.io -u acr41772847 -p Password
+
+docker tag notlods/examplewebapp:2.0 acr41772847.azurecr.io/examplewebapp:2.0
+
+docker push acr41772847.azurecr.io/examplewebapp:2.0
+
+docker image rm acr41772847.azurecr.io/examplewebapp:2.0
+
+docker image rm $(docker image ls -a -q)
+
+docker run -d -p 80:80 acr41772847.azurecr.io/examplewebapp:2.0
